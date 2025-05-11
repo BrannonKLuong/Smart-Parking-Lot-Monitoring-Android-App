@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "291301758897",
+    "project_id": "smart-monitoring-project",
+    "storage_bucket": "smart-monitoring-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291301758897:android:019ba19255eaad24864f90",
+        "android_client_info": {
+          "package_name": "com.example.parkingandroid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsiUQwfWoGbIJyoOT3UAG-V5q-7oW6png"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291301758897:android:9a2b91ecdb947d56864f90",
+        "android_client_info": {
+          "package_name": "com.smart.parking.monitoring"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsiUQwfWoGbIJyoOT3UAG-V5q-7oW6png"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

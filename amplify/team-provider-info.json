@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-parkingandroid-dev-d6f39-authRole",
+      "UnauthRoleArn": "arn:aws:iam::588364035688:role/amplify-parkingandroid-dev-d6f39-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::588364035688:role/amplify-parkingandroid-dev-d6f39-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-parkingandroid-dev-d6f39-deployment",
+      "UnauthRoleName": "amplify-parkingandroid-dev-d6f39-unauthRole",
+      "StackName": "amplify-parkingandroid-dev-d6f39",
+      "StackId": "arn:aws:cloudformation:us-west-2:588364035688:stack/amplify-parkingandroid-dev-d6f39/0ceba7a0-2ad0-11f0-9e0a-06c6e436b1f3",
+      "AmplifyAppId": "d6jt5foc4wvmx"
+    },
+    "categories": {
+      "auth": {
+        "parkingandroidae52958d": {}
+      },
+      "api": {
+        "parkingandroidapi": {}
+      }
+    }
+  }
+}

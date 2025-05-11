@@ -1,0 +1,43 @@
+# this is an auto generated file. This will be overwritten
+
+subscription OnCreateParkingSpot(
+  $filter: ModelSubscriptionParkingSpotFilterInput
+) {
+  onCreateParkingSpot(filter: $filter) {
+    id
+    occupied
+    lastChanged
+    favorite
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateParkingSpot(
+  $filter: ModelSubscriptionParkingSpotFilterInput
+) {
+  onUpdateParkingSpot(filter: $filter) {
+    id
+    occupied
+    lastChanged
+    favorite
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteParkingSpot(
+  $filter: ModelSubscriptionParkingSpotFilterInput
+) {
+  onDeleteParkingSpot(filter: $filter) {
+    id
+    occupied
+    lastChanged
+    favorite
+    createdAt
+    updatedAt
+    __typename
+  }
+}

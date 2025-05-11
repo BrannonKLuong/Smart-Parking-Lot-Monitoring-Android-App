@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "parkingandroidapi",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authparkingandroidae52958d",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

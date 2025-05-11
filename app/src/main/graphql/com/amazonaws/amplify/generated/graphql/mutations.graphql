@@ -1,0 +1,46 @@
+# this is an auto generated file. This will be overwritten
+
+mutation CreateParkingSpot(
+  $input: CreateParkingSpotInput!
+  $condition: ModelParkingSpotConditionInput
+) {
+  createParkingSpot(input: $input, condition: $condition) {
+    id
+    occupied
+    lastChanged
+    favorite
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateParkingSpot(
+  $input: UpdateParkingSpotInput!
+  $condition: ModelParkingSpotConditionInput
+) {
+  updateParkingSpot(input: $input, condition: $condition) {
+    id
+    occupied
+    lastChanged
+    favorite
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteParkingSpot(
+  $input: DeleteParkingSpotInput!
+  $condition: ModelParkingSpotConditionInput
+) {
+  deleteParkingSpot(input: $input, condition: $condition) {
+    id
+    occupied
+    lastChanged
+    favorite
+    createdAt
+    updatedAt
+    __typename
+  }
+}
