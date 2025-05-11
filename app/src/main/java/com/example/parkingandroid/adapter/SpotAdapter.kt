@@ -1,19 +1,31 @@
 package com.example.parkingandroid.adapter
-import com.example.parkingandroid.model.ParkingSpotData
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil // Import DiffUtil
+import androidx.recyclerview.widget.ListAdapter // Import ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.parkingandroid.R
 import com.example.parkingandroid.databinding.ItemSpotBinding
+import com.example.parkingandroid.model.ParkingSpotData // Ensure this import is correct
 
-class SpotsAdapter : RecyclerView.Adapter<SpotsAdapter.SpotVH>() {
-    private val items = mutableListOf<ParkingSpotData>()
+// Change to extend ListAdapter
+class SpotsAdapter : ListAdapter<ParkingSpotData, SpotsAdapter.SpotVH>(SpotDiffCallback()) {
 
-    fun submitList(newList: List<ParkingSpotData>) {
-        items.clear()
-        items.addAll(newList)
-        notifyDataSetChanged()
+    // DiffUtil callback to efficiently calculate list updates
+    class SpotDiffCallback : DiffUtil.ItemCallback<ParkingSpotData>() {
+        override fun areItemsTheSame(oldItem: ParkingSpotData, newItem: ParkingSpotData): Boolean {
+            // Items are the same if their unique ID is the same
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: ParkingSpotData, newItem: ParkingSpotData): Boolean {
+            // Contents are the same if all relevant data fields are the same
+            return oldItem == newItem // Data classes automatically implement equals() and hashCode()
+        }
     }
+
+    // The submitList function is now provided by ListAdapter, remove your manual one
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SpotVH {
         val binding = ItemSpotBinding.inflate(
@@ -23,10 +35,13 @@ class SpotsAdapter : RecyclerView.Adapter<SpotsAdapter.SpotVH>() {
     }
 
     override fun onBindViewHolder(holder: SpotVH, position: Int) {
-        holder.bind(items[position])
+        // Use getItem() provided by ListAdapter
+        val spot = getItem(position)
+        holder.bind(spot)
     }
 
-    override fun getItemCount() = items.size
+    // getItemCount() is also provided by ListAdapter, remove your manual one
+    // override fun getItemCount() = currentList.size // You can use currentList.size if needed
 
     inner class SpotVH(private val b: ItemSpotBinding) :
         RecyclerView.ViewHolder(b.root) {
