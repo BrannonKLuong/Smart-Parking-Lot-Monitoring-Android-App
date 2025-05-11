@@ -1,156 +1,153 @@
 package com.example.parkingandroid
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.compose.runtime.Composable
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.os.Build
+
+import com.example.parkingandroid.model.ParkingSpotData
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import android.app.PendingIntent
-import android.content.Intent
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.parkingandroid.adapter.SpotsAdapter
+import com.example.parkingandroid.databinding.ActivityMainBinding
+import com.example.parkingandroid.model.TokenPayload // Import TokenPayload from model
+import com.example.parkingandroid.network.ApiClient
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.net.UnknownHostException
 
-
-class MainActivity : ComponentActivity() {
-
-    private val viewModel: ParkingViewModel by viewModels()
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: SpotsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel()
 
-        // 5B: register the “spot freed” callback
-        viewModel.setOnSpotFreeListener { spot ->
-            Log.i("NotifyTest", "Spot ${spot.id} freed and favorite—sending notification")
-            sendSpotFreeNotification(spot)
+        // 1) Inflate via ViewBinding:
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // 2) RecyclerView wiring:
+        adapter = SpotsAdapter()
+        binding.spotsList.layoutManager = LinearLayoutManager(this)
+        binding.spotsList.adapter = adapter
+
+        // 3) Kick off your network fetch:
+        fetchAndDisplaySpots()
+
+        // 4) Dashboard in a WebView:
+        binding.webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
         }
+        // Replace with your actual URL
+        binding.webView.loadUrl("http://10.0.2.2:8000/")
 
-        setContent {
-            val spots by viewModel.spots.collectAsState()
+        // 5) FCM token → server
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Notice: no 'this@MainActivity.' qualifier needed here
+                    registerToken(task.result)
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Failed to get FCM token: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT // Corrected: Pass duration constant
+                    ).show()
+                    Log.e("FCM Token Error", "Failed to get token", task.exception)
+                }
+            }
+    }
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(spots) { spot ->
-                    SpotItem(
-                        spot,
-                        onToggleFavorite = { viewModel.toggleFavorite(it) },
-                        onToggleOccupied = { viewModel.toggleOccupied(it) }
-                    )
+    /** Sends the FCM registration token to your backend. */
+    private fun registerToken(token: String?) {
+        if (token == null) {
+            Log.w("FCM", "FCM token is null. Not registering.")
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = ApiClient.service.registerToken(
+                    TokenPayload(token = token, platform = "android")
+                )
+                if (response.isSuccessful) {
+                    Log.d("FCM", "Token registered successfully.")
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "Token registered!", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.e("FCM", "Failed to register token: ${response.errorBody()?.string()}")
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Failed to register token. Server error: ${response.code()}",
+                            Toast.LENGTH_LONG // Corrected: Pass duration constant
+                        ).show()
+                    }
+                }
+            } catch (e: UnknownHostException) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "No network connection", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Network error: ${e.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
     }
 
-    // 5A: create the notification channel
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Spot Alerts"
-            val description = "Notifications for your favorite parking spots"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                this.description = description
-                enableLights(true)
-                enableVibration(true)
+    /** Fetches your spots and feeds them into the RecyclerView adapter. */
+    private fun fetchAndDisplaySpots() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val resp = ApiClient.service.getSpots()
+                if (resp.isSuccessful) {
+                    val spots = resp.body()?.spots?.map { dto ->
+                        ParkingSpotData(
+                            id = dto.id,
+                            isFree = dto.is_available
+                        )
+                    } ?: emptyList()
+
+                    withContext(Dispatchers.Main) {
+                        adapter.submitList(spots)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Server error: ${resp.code()}",
+                            Toast.LENGTH_LONG // Corrected: Pass duration constant
+                        ).show()
+                    }
+                }
+            } catch (e: UnknownHostException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Cannot connect to server. Check your network or backend.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: IOException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Network error: ${e.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-            Log.i("NotifyTest", "Created notification channel $CHANNEL_ID with importance $importance")
-        }
-    }
-
-    // 5C: fire a notification when a favorite spot frees up
-    private val CHANNEL_ID = "spot_alerts"
-
-    private fun sendSpotFreeNotification(spot: ParkingSpotData) {
-        // 1) Check notification permission on Android 13+
-//        val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-//        } else {
-//            true
-//        }
-//        Log.i("NotifyTest", "hasNotificationPermission=$hasPermission")
-//        if (!hasPermission) {
-//            Log.w("NotifyTest", "POST_NOTIFICATIONS permission not granted; skipping notification.")
-//            return
-//        }
-
-        // 2) Build the notification
-        // 1. Build an intent back to the app
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // 2. Build the notification
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_star_filled)          // must be a valid drawable
-            .setContentTitle("Spot ${spot.id} Available!")
-            .setContentText("Your favorite spot is now free.")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)     // high priority for heads-up
-            .setAutoCancel(true)                              // dismiss on tap
-            .setContentIntent(pendingIntent)                  // open app when tapped
-            .build()
-
-        // 3. Dispatch it
-        NotificationManagerCompat.from(this)
-            .notify(spot.id.hashCode(), notification)
-        Log.i("NotifyTest", "Notification dispatched for spot ${spot.id}")
-    }
-}
-
-@Composable
-fun SpotItem(
-    spot: ParkingSpotData,
-    onToggleFavorite: (ParkingSpotData) -> Unit,
-    onToggleOccupied: (ParkingSpotData) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .background(if (spot.occupied) Color.Red else Color.Green)
-                .clickable { onToggleOccupied(spot) }  // tap to simulate freeing
-        )
-        IconButton(onClick = { onToggleFavorite(spot) }) {
-            Icon(
-                painter = painterResource(
-                    if (spot.favorite) R.drawable.ic_star_filled
-                    else R.drawable.ic_star_outline
-                ),
-                contentDescription = "Toggle Favorite"
-            )
         }
     }
 }
