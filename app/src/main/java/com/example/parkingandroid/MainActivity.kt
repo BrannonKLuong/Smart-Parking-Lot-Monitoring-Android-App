@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.json.JSONObject
+import org.json.JSONArray // Import JSONArray
 import java.io.IOException
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
@@ -112,28 +113,60 @@ class MainActivity : AppCompatActivity() {
     private fun handleWebSocketMessage(message: String) {
         try {
             val json = JSONObject(message)
-            val spotId = json.optString("spot_id")
-            val status = json.optString("status")
+            val messageType = json.optString("type") // Get the message type
 
-            if (spotId.isNotEmpty()) {
-                // Explicitly cast adapter to ListAdapter to access currentList
-                val currentList = (adapter as ListAdapter<ParkingSpotData, *>).currentList.toMutableList()
-                val index = currentList.indexOfFirst { it.id == spotId }
+            when (messageType) {
+                "spot_status_update" -> {
+                    val spotId = json.optString("spot_id")
+                    val status = json.optString("status")
 
-                if (index != -1) {
-                    val updatedSpot = currentList[index].copy(isFree = status != "occupied")
-                    currentList[index] = updatedSpot
+                    if (spotId.isNotEmpty()) {
+                        // Explicitly cast adapter to ListAdapter to access currentList
+                        val currentList = (adapter as ListAdapter<ParkingSpotData, *>).currentList.toMutableList()
+                        val index = currentList.indexOfFirst { it.id == spotId }
 
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        adapter.submitList(currentList)
-                        Log.d("WebSocket", "Updated spot ID: $spotId with status: $status") // Added log for successful update
+                        if (index != -1) {
+                            val updatedSpot = currentList[index].copy(isFree = status != "occupied")
+                            currentList[index] = updatedSpot
+
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                adapter.submitList(currentList)
+                                Log.d("WebSocket", "Updated spot ID: $spotId with status: $status") // Added log for successful update
+                            }
+                        } else {
+                            Log.w("WebSocket", "Received status update for unknown spot ID: $spotId")
+                        }
+                    } else {
+                        Log.w("WebSocket", "Received spot status update message with no spot_id: $message")
                     }
-                } else {
-                    Log.w("WebSocket", "Received update for unknown spot ID: $spotId")
                 }
-            } else {
-                Log.w("WebSocket", "Received message with no spot_id: $message")
+                "config_update" -> {
+                    val spotsArray = json.optJSONArray("spots")
+                    if (spotsArray != null) {
+                        val updatedSpots = mutableListOf<ParkingSpotData>()
+                        for (i in 0 until spotsArray.length()) {
+                            val spotJson = spotsArray.getJSONObject(i)
+                            val spotId = spotJson.optString("id")
+                            val isAvailable = spotJson.optBoolean("is_available", true) // Default to true if not present
+
+                            if (spotId.isNotEmpty()) {
+                                updatedSpots.add(ParkingSpotData(id = spotId, isFree = isAvailable))
+                            }
+                        }
+
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            adapter.submitList(updatedSpots)
+                            Log.d("WebSocket", "Received and applied config update. Total spots: ${updatedSpots.size}") // Log config update
+                        }
+                    } else {
+                        Log.w("WebSocket", "Received config update message with no 'spots' array: $message")
+                    }
+                }
+                else -> {
+                    Log.w("WebSocket", "Received message with unknown type: $messageType")
+                }
             }
+
         } catch (e: Exception) {
             Log.e("WebSocket", "Error parsing WebSocket message: $message", e)
             lifecycleScope.launch(Dispatchers.Main) {
