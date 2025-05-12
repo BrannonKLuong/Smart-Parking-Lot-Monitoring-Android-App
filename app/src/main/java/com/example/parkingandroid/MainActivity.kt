@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             val json = JSONObject(message)
             val messageType = json.optString("type") // Get the message type
 
-            when (messageType) {
+            when (messageType) { // Use a when statement to handle different types
                 "spot_status_update" -> {
                     val spotId = json.optString("spot_id")
                     val status = json.optString("status")
@@ -141,26 +141,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 "config_update" -> {
-                    val spotsArray = json.optJSONArray("spots")
-                    if (spotsArray != null) {
-                        val updatedSpots = mutableListOf<ParkingSpotData>()
-                        for (i in 0 until spotsArray.length()) {
-                            val spotJson = spotsArray.getJSONObject(i)
-                            val spotId = spotJson.optString("id")
-                            val isAvailable = spotJson.optBoolean("is_available", true) // Default to true if not present
-
-                            if (spotId.isNotEmpty()) {
-                                updatedSpots.add(ParkingSpotData(id = spotId, isFree = isAvailable))
-                            }
-                        }
-
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            adapter.submitList(updatedSpots)
-                            Log.d("WebSocket", "Received and applied config update. Total spots: ${updatedSpots.size}") // Log config update
-                        }
-                    } else {
-                        Log.w("WebSocket", "Received config update message with no 'spots' array: $message")
-                    }
+                    Log.d("WebSocket", "Received config update message. Re-fetching spots...")
+                    // Re-fetch the entire spot list and their statuses from the API
+                    fetchAndDisplaySpots() // <-- Call the existing fetch function
                 }
                 else -> {
                     Log.w("WebSocket", "Received message with unknown type: $messageType")
@@ -252,12 +235,13 @@ class MainActivity : AppCompatActivity() {
                     val spots = resp.body()?.spots?.map { dto ->
                         ParkingSpotData(
                             id = dto.id,
-                            isFree = dto.is_available
+                            isFree = dto.is_available // Use the is_available status from the API
                         )
                     } ?: emptyList()
 
                     withContext(Dispatchers.Main) {
                         adapter.submitList(spots)
+                        Log.d("MainActivity", "Fetched and displayed ${spots.size} spots.") // Log the number of spots
                     }
                 } else {
                     val errorBody = resp.errorBody()?.string()
