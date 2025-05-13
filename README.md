@@ -51,19 +51,18 @@ The Android app is currently in its early stages of development. The core functi
     * Access to the backend API (ensure the backend is running and accessible from your Android emulator or device, typically `http://10.0.2.2:8000/` for the emulator).
 2.  **Clone the Repository:**
     ```bash
-    git clone <android_repo_url>
-    cd <android_repo_name>
+    git clone [https://github.com/BrannonKLuong/Smart-Parking-Lot-Monitoring-Android-App](https://github.com/BrannonKLuong/Smart-Parking-Lot-Monitoring-Android-App)
     ```
-    (Replace `<android_repo_url>` and `<android_repo_name>` with your Android project's repository details). If the Android code is in a subdirectory of the main repo, navigate to that subdirectory.
-3.  **Configure Firebase:**
+    After cloning, a directory named `Smart-Parking-Lot-Monitoring-Android-App` will be created.
+3.  **Navigate to the Project Directory:**
+    ```bash
+    cd Smart-Parking-Lot-Monitoring-Android-App
+    ```
+4.  **Configure Firebase:**
     * Set up a Firebase project in the Firebase console.
     * Add an Android app to your Firebase project.
     * Download the `google-services.json` file and place it in the `app/` directory of your Android project.
     * Ensure your project-level and app-level `build.gradle` files have the necessary Firebase dependencies and plugins configured (refer to Firebase documentation for details).
-4.  **Configure Backend API Endpoint:** Verify and update the `BASE_URL` in `ApiClient.kt` to point to the correct URL of your running backend API (currently set to `http://10.0.2.2:8000/` which is correct for the Android emulator connecting to localhost).
-5.  **Install Dependencies:** Android dependencies are managed by Gradle. Android Studio should handle this automatically when you open the project.
-6.  **Build and Run:** Build and run the project using Android Studio on an emulator or physical device.
-
-## File Structure
-
-Based on the files provided, the core structure includes:
+5.  **Configure Backend API Endpoint:** Verify and update the `BASE_URL` in `ApiClient.kt` to point to the correct URL of your running backend API (currently set to `http://10.0.2.2:8000/` which is correct for the Android emulator connecting to localhost).
+6.  **Install Dependencies:** Android dependencies are managed by Gradle. Android Studio should handle this automatically when you open the project.
+7.  **Build and Run:** Build and run the project using Android Studio on an emulator or physical device.
