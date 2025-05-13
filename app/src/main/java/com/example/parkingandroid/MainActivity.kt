@@ -105,16 +105,27 @@ class MainActivity : AppCompatActivity() {
 
         fetchAndDisplaySpots()
 
+//        binding.webView.settings.apply {
+//            javaScriptEnabled = true
+//            domStorageEnabled = true
+//        }
+//        // We will change this later for the direct video feed
+//        binding.webView.loadUrl("http://10.0.2.2:8000/")
+
         binding.webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
+            useWideViewPort = true
+            loadWithOverviewMode = true
+             builtInZoomControls = true
+             displayZoomControls = false // Hides the +/- zoom buttons if builtInZoomControls is true
         }
-        // We will change this later for the direct video feed
-        binding.webView.loadUrl("http://10.0.2.2:8000/")
+        binding.webView.loadUrl("http://10.0.2.2:8000/webcam_feed")
 
-        // ---- START: Ask for notification permission ----
+
+
+
         askNotificationPermission()
-        // ---- END: Ask for notification permission ----
 
         getAndRegisterFcmToken() // Renamed function for clarity
         startWebSocket()
