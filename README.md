@@ -54,12 +54,6 @@ The Android app has successfully implemented core functionalities:
 
 ## Future Goals
 
-* **Enhanced Notifications:**
-    * Allow users to tap a notification to open the app and potentially highlight the specific freed spot.
-    * Explore notification customization (sound, vibration).
-* **Improved Video Feed Display:**
-    * Consider native MJPEG libraries for potentially smoother playback or more control over the video display than `WebView`.
-    * Add playback controls (e.g., refresh/reconnect) if needed.
 * **User Preferences:**
     * Allow users to configure notification preferences (e.g., only for specific spots, quiet hours).
 * **UI/UX Enhancements:**
