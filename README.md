@@ -71,20 +71,20 @@ The Android app has successfully implemented core functionalities:
     * Access to the backend API and video stream (ensure the backend, including the Dockerized services, is running and accessible from your Android emulator or device, typically `http://10.0.2.2:8000/` for the emulator connecting to localhost).
 2.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/BrannonKLuong/ParkingAndroid](https://github.com/BrannonKLuong/ParkingAndroid) # TODO: Verify this is the correct URL for your Android app's repository
-    cd YourAndroidProjectDirectoryName # Navigate into the cloned Android project directory
+    git clone [https://github.com/BrannonKLuong/ParkingAndroid.git](https://github.com/BrannonKLuong/ParkingAndroid.git)
     ```
-3.  **Configure Firebase:**
+    After cloning, a directory named `ParkingAndroid` will be created.
+3.  **Navigate to the Project Directory:**
+    ```bash
+    cd ParkingAndroid
+    ```
+4.  **Configure Firebase:**
     * Go to the [Firebase console](https://console.firebase.google.com/) and create a new project (or use an existing one).
     * Add an Android app to your Firebase project:
         * Register app with package name: `com.example.parkingandroid` (or your app's actual package name as defined in `build.gradle`).
         * Download the generated `google-services.json` file.
-    * Place the downloaded `google-services.json` file in the `app/` directory of your Android Studio project (e.g., `YourAndroidProjectDirectoryName/app/google-services.json`).
+    * Place the downloaded `google-services.json` file in the `app/` directory of your Android Studio project (e.g., `ParkingAndroid/app/google-services.json`).
     * Ensure your project-level `build.gradle` and app-level `build.gradle` files have the necessary Firebase dependencies and Google Services plugin applied (these should already be in your project).
-4.  **Backend API Endpoint:** Verify that the `BASE_URL` in `ApiClient.kt` (usually located in `app/src/main/java/com/example/parkingandroid/network/ApiClient.kt`) is set to `http://10.0.2.2:8000/`. This is correct for an Android emulator connecting to a backend running on your development machine's `localhost`.
-5.  **Open in Android Studio:** Open the Android project directory in Android Studio. It should sync Gradle dependencies automatically.
-6.  **Build and Run:** Build and run the project using Android Studio on an Android emulator (API 24+ recommended, with Google Play Services for FCM) or a physical device. Ensure the emulator/device has network connectivity.
-
----
-
-You can copy and paste this directly into your `README.md` file for the Android application.
+5.  **Backend API Endpoint:** Verify that the `BASE_URL` in `ApiClient.kt` (usually located in `app/src/main/java/com/example/parkingandroid/network/ApiClient.kt`) is set to `http://10.0.2.2:8000/`. This is correct for an Android emulator connecting to a backend running on your development machine's `localhost`.
+6.  **Open in Android Studio:** Open the `ParkingAndroid` project directory in Android Studio. It should sync Gradle dependencies automatically.
+7.  **Build and Run:** Build and run the project using Android Studio on an Android emulator (API 24+ recommended, with Google Play Services for FCM) or a physical device. Ensure the emulator/device has network connectivity.
