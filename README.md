@@ -1,5 +1,6 @@
 # Smart Parking Lot Monitoring System - Android App
 ![Android App Demo](assets/smart-parking-lot-android-demo.gif)
+*In the list, a filled star indicates an occupied spot, while an unfilled star indicates a free spot.*
 ## Project Description
 
 This is the Android application component of the Smart Parking Lot Monitoring System. Its primary function is to provide users with real-time updates about parking spot availability. Currently, it connects to the backend to receive and display the occupancy status (filled/unfilled) of parking spots using a list view.
