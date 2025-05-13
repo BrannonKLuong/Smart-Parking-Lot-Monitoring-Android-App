@@ -51,7 +51,7 @@ The Android app is currently in its early stages of development. The core functi
     * Access to the backend API (ensure the backend is running and accessible from your Android emulator or device, typically `http://10.0.2.2:8000/` for the emulator).
 2.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/BrannonKLuong/Smart-Parking-Lot-Monitoring-Android-App](https://github.com/BrannonKLuong/Smart-Parking-Lot-Monitoring-Android-App)
+    git clone https://github.com/BrannonKLuong/Smart-Parking-Lot-Monitoring-Android-App
     ```
     After cloning, a directory named `Smart-Parking-Lot-Monitoring-Android-App` will be created.
 3.  **Navigate to the Project Directory:**
