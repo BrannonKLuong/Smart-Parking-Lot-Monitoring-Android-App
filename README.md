@@ -1,6 +1,6 @@
 # Smart Parking Lot Monitoring System - Android App
 
-![Android App Demo](assets/smart-parking-lot-android-demo.gif) 
+![Android App Demo](assets/notification_parking_lot.gif) 
 
 *In the list, a filled star indicates an occupied spot, while an unfilled star indicates a free spot. Notifications alert when a spot becomes available.*
 
