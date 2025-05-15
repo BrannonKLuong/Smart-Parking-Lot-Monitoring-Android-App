@@ -1,16 +1,19 @@
 # Smart Parking Lot Monitoring System - Android App
-![Android App Demo](assets/smart-parking-lot-android-demo.gif)
 
-*In the list, a filled star indicates an occupied spot, while an unfilled star indicates a free spot.*
+![Android App Demo](assets/notification_parking_lot.gif) 
+
+*In the list, a filled star indicates an occupied spot, while an unfilled star indicates a free spot. Notifications alert when a spot becomes available. Gif also does not provide audio but notification does ping*
+
 ## Project Description
 
-This is the Android application component of the Smart Parking Lot Monitoring System. Its primary function is to provide users with real-time updates about parking spot availability. Currently, it connects to the backend to receive and display the occupancy status (filled/unfilled) of parking spots using a list view.
-
-The app also includes functionality to register the device for potential push notifications via Firebase Cloud Messaging (FCM).
+This is the Android application component of the Smart Parking Lot Monitoring System. Its primary function is to provide users with real-time updates about parking spot availability, alert them to new vacancies, and allow them to view the parking lot. It connects to a Python FastAPI backend that processes video to determine occupancy.
 
 ## Purpose within the System
 
-The Android app serves as a mobile interface for users to quickly check the status of parking spots. While in early development, it establishes the connection to the backend and lays the groundwork for features like push notifications and potentially viewing the video feed directly on a mobile device.
+The Android app serves as a mobile interface for users to:
+* Quickly check the current status of all parking spots.
+* Receive timely push notifications when a monitored spot becomes free.
+* View a live video feed of the parking area.
 
 ## Technologies
 
@@ -19,52 +22,69 @@ This project is built using Native Android development with Kotlin and leverages
 * **Platform:** Native Android
 * **Language:** Kotlin (`.kt`)
 * **Networking (REST API):** Retrofit with Moshi Converter for fetching initial spot data and registering FCM tokens.
-* **Networking (WebSocket):** OkHttp for establishing and managing the WebSocket connection for real-time updates.
+* **Networking (WebSocket):** OkHttp for establishing and managing the WebSocket connection for live spot status updates.
 * **Asynchronous Operations:** Kotlin Coroutines and `lifecycleScope` for managing background tasks like network calls and WebSocket handling.
-* **UI Components:** RecyclerView with ListAdapter and DiffUtil for efficiently displaying the list of parking spots.
-* **Messaging:** Firebase Cloud Messaging (FCM) for device token generation and potential push notifications.
+* **UI Components:**
+    * RecyclerView with ListAdapter and DiffUtil for efficiently displaying the list of parking spots.
+    * WebView for displaying the live MJPEG video stream from the backend.
+* **Push Notifications:** Firebase Cloud Messaging (FCM) for receiving alerts about spot vacancies. Includes a `FirebaseMessagingService` to handle incoming messages and display system notifications.
+* **Permissions:** Handles runtime permissions for `POST_NOTIFICATIONS` (Android 13+).
 * **Dependency Injection (Implicit):** Using an `object` for `ApiClient` provides a simple singleton for network service access.
 
 ## Features
 
-* **Real-time Status Display:** Connects to the backend via WebSocket to receive real-time updates on parking spot status (occupied/free) and displays them in a list.
+* **Real-time Spot Status Display:** Connects to the backend via WebSocket to receive live updates on parking spot status (occupied/free) and displays them in a list.
 * **Initial Spot Data Fetch:** Fetches the initial list of parking spots and their statuses from the backend API using Retrofit.
-* **FCM Token Registration:** Retrieves the device's FCM token and registers it with the backend via a dedicated API endpoint using Retrofit.
-* **Basic UI:** Displays a list of spots with a visual indicator of their status.
+* **FCM Push Notifications for Vacancies:**
+    * Retrieves the device's FCM token and registers it with the backend.
+    * Receives push notifications via Firebase Cloud Messaging when a parking spot becomes available.
+    * Displays a system notification to the user indicating which spot is free.
+* **Live Video Feed:** Displays the MJPEG video stream from the backend within a `WebView` component.
+* **Basic UI:** Presents a list of spots with visual status indicators and integrates the video feed.
 
 ## Current Status and Progress
 
-The Android app is currently in its early stages of development. The core functionality to connect to the backend, fetch the initial list of spots, display their filled/unfilled status in a RecyclerView, and handle real-time status updates via WebSocket is operational. The mechanism for registering the device for FCM notifications is also implemented, establishing the necessary link with the backend's notification capabilities. Error handling for network operations is included.
+The Android app has successfully implemented core functionalities:
+* Connection to the backend for initial data and real-time WebSocket updates for spot statuses.
+* Display of spot statuses (filled/unfilled) in a RecyclerView.
+* Registration of the device for FCM notifications.
+* **Successful reception and display of push notifications** when a spot becomes free, triggered by the backend. Logic to prevent notification spamming for the same vacancy event is in place on the backend.
+* **Successful display of the live MJPEG video feed** from the backend in a `WebView`.
+* Basic error handling for network operations.
 
 ## Future Goals
 
-* **Receive Spot Vacancy Notifications:** Implement the logic to receive and process push notifications from the backend when a specific parking spot becomes available, and display them to the user.
-* **Spot Availability Details:** Enhance notifications or the app's UI to show details about the freed spot (e.g., Spot ID, time available).
-* **View Live Video Feed:** Integrate functionality to stream and display the video feed processed by the backend within the Android application.
-* **Notification Preferences:** Allow users to configure which spots they want to receive notifications for.
-* **Background Processing:** Ensure the app can receive notifications reliably even when running in the background.
-* **Improved UI/UX:** Enhance the user interface for better readability and ease of use, potentially adding more details or a different visualization.
-* **Robust WebSocket Reconnection:** Implement more sophisticated reconnection logic for the WebSocket in case of disconnections.
+* **User Preferences:**
+    * Allow users to configure notification preferences (e.g., only for specific spots, quiet hours).
+* **UI/UX Enhancements:**
+    * Improve the overall user interface for better visual appeal and user experience.
+    * Potentially integrate the spot list more directly with a visual map of the parking lot if spot coordinate data becomes available.
+* **Robustness:**
+    * Enhance WebSocket reconnection logic further.
+    * Add more comprehensive error handling and user feedback.
+    * Thoroughly test background notification reliability across different Android versions and device states.
 
 ## Setup and Installation
 
 1.  **Prerequisites:**
-    * Android Studio installed.
-    * Access to the backend API (ensure the backend is running and accessible from your Android emulator or device, typically `http://10.0.2.2:8000/` for the emulator).
+    * Android Studio (latest stable version recommended).
+    * Access to the backend API and video stream (ensure the backend, including the Dockerized services, is running and accessible from your Android emulator or device, typically `http://10.0.2.2:8000/` for the emulator connecting to localhost).
 2.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/BrannonKLuong/Smart-Parking-Lot-Monitoring-Android-App
+    git clone [https://github.com/BrannonKLuong/ParkingAndroid.git](https://github.com/BrannonKLuong/ParkingAndroid.git)
     ```
-    After cloning, a directory named `Smart-Parking-Lot-Monitoring-Android-App` will be created.
+    After cloning, a directory named `ParkingAndroid` will be created.
 3.  **Navigate to the Project Directory:**
     ```bash
-    cd Smart-Parking-Lot-Monitoring-Android-App
+    cd ParkingAndroid
     ```
 4.  **Configure Firebase:**
-    * Set up a Firebase project in the Firebase console.
-    * Add an Android app to your Firebase project.
-    * Download the `google-services.json` file and place it in the `app/` directory of your Android project.
-    * Ensure your project-level and app-level `build.gradle` files have the necessary Firebase dependencies and plugins configured (refer to Firebase documentation for details).
-5.  **Configure Backend API Endpoint:** Verify and update the `BASE_URL` in `ApiClient.kt` to point to the correct URL of your running backend API (currently set to `http://10.0.2.2:8000/` which is correct for the Android emulator connecting to localhost).
-6.  **Install Dependencies:** Android dependencies are managed by Gradle. Android Studio should handle this automatically when you open the project.
-7.  **Build and Run:** Build and run the project using Android Studio on an emulator or physical device.
+    * Go to the [Firebase console](https://console.firebase.google.com/) and create a new project (or use an existing one).
+    * Add an Android app to your Firebase project:
+        * Register app with package name: `com.example.parkingandroid` (or your app's actual package name as defined in `build.gradle`).
+        * Download the generated `google-services.json` file.
+    * Place the downloaded `google-services.json` file in the `app/` directory of your Android Studio project (e.g., `ParkingAndroid/app/google-services.json`).
+    * Ensure your project-level `build.gradle` and app-level `build.gradle` files have the necessary Firebase dependencies and Google Services plugin applied (these should already be in your project).
+5.  **Backend API Endpoint:** Verify that the `BASE_URL` in `ApiClient.kt` (usually located in `app/src/main/java/com/example/parkingandroid/network/ApiClient.kt`) is set to `http://10.0.2.2:8000/`. This is correct for an Android emulator connecting to a backend running on your development machine's `localhost`.
+6.  **Open in Android Studio:** Open the `ParkingAndroid` project directory in Android Studio. It should sync Gradle dependencies automatically.
+7.  **Build and Run:** Build and run the project using Android Studio on an Android emulator (API 24+ recommended, with Google Play Services for FCM) or a physical device. Ensure the emulator/device has network connectivity. 
