@@ -3,16 +3,16 @@ import com.example.parkingandroid.model.ParkingSpotData
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast // Import Toast
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.parkingandroid.adapter.SpotsAdapter
 import com.example.parkingandroid.network.ApiClient
-import kotlinx.coroutines.Dispatchers // Import Dispatchers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext // Import withContext
+import kotlinx.coroutines.withContext
 
 class SpotListFragment : Fragment(R.layout.fragment_spot_list) {
 
@@ -35,12 +35,12 @@ class SpotListFragment : Fragment(R.layout.fragment_spot_list) {
                 adapter.submitList(spots)
             } catch (e: Exception) {
                 Log.e("SpotListFragment", "Failed to load spots", e)
-                // Add Toast message on the main thread to inform the user
+
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
-                        requireContext(), // Use requireContext() in Fragments
+                        requireContext(),
                         "Failed to load parking spots: ${e.localizedMessage}",
-                        Toast.LENGTH_LONG // Use a duration constant
+                        Toast.LENGTH_LONG
                     ).show()
                 }
             }
