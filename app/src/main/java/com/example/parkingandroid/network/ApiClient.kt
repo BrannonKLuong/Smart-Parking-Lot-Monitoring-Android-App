@@ -5,7 +5,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 object ApiClient {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8000/")
+//        .baseUrl("http://10.0.2.2:8000/")
+        .baseUrl("https://5kww6ef6ra.us-east-2.awsapprunner.com/")
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
 

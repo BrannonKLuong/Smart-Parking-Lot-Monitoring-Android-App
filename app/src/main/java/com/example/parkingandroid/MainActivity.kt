@@ -103,8 +103,8 @@ class MainActivity : AppCompatActivity() {
              builtInZoomControls = true
              displayZoomControls = false
         }
-        binding.webView.loadUrl("http://10.0.2.2:8000/webcam_feed")
-
+//        binding.webView.loadUrl("http://10.0.2.2:8000/webcam_feed")
+        binding.webView.loadUrl("https://5kww6ef6ra.us-east-2.awsapprunner.com/webcam_feed")
         askNotificationPermission()
 
         getAndRegisterFcmToken()
@@ -260,10 +260,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun startWebSocket() {
         val request = Request.Builder()
-            .url("ws://10.0.2.2:8000/ws")
+//            .url("ws://10.0.2.2:8000/ws")
+            .url("wss://5kww6ef6ra.us-east-2.awsapprunner.com/ws")
             .build()
         webSocket = okHttpClient.newWebSocket(request, webSocketListener)
-        Log.d("WebSocket", "Attempting to connect to ws://10.0.2.2:8000/ws")
+//        Log.d("WebSocket", "Attempting to connect to ws://10.0.2.2:8000/ws")
     }
 
 
